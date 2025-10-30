@@ -555,7 +555,7 @@
             <p>Register to start managing your finances</p>
         </div>
         <div id="registerError"></div>
-        <form onsubmit="handleRegister(event)">
+        <form id="registerFormElement" onsubmit="handleRegister(event)">
             <div class="form-group">
                 <label for="registerUsername">Username</label>
                 <input type="text" id="registerUsername" placeholder="Choose a username" required minlength="3">
@@ -729,6 +729,7 @@
 
         function handleRegister(event) {
             event.preventDefault();
+            console.log('Registration attempt started');
             
             const username = document.getElementById('registerUsername').value.trim();
             const password = document.getElementById('registerPassword').value;
@@ -773,10 +774,13 @@
 
             userTransactions[username] = [];
 
+            console.log('User registered successfully:', username);
+            console.log('All users:', Object.keys(users));
+
             errorDiv.innerHTML = '<div class="success-message">Account created successfully! Redirecting to login...</div>';
             
             setTimeout(() => {
-                document.getElementById('registerForm').reset();
+                document.getElementById('registerFormElement').reset();
                 errorDiv.innerHTML = '';
                 showLogin();
             }, 1500);
@@ -784,9 +788,13 @@
 
         function handleLogin(event) {
             event.preventDefault();
+            console.log('Login attempt started');
+            console.log('Registered users:', Object.keys(users));
             
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
+
+            console.log('Attempting login for:', username);
 
             const errorDiv = document.getElementById('loginError');
             errorDiv.innerHTML = '';
@@ -800,20 +808,25 @@
             // Check if user exists
             if (!users[username]) {
                 errorDiv.innerHTML = '<div class="error-message">Account not found. Please create an account first.</div>';
+                console.log('User not found');
                 return;
             }
 
             // Check password
             if (users[username].password !== password) {
                 errorDiv.innerHTML = '<div class="error-message">Invalid username or password</div>';
+                console.log('Invalid password');
                 return;
             }
 
             // Login successful
+            console.log('Login successful!');
             currentUser = username;
             loadUserData();
             
-            document.getElementById('loginForm').reset();
+            // Clear form manually
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
             errorDiv.innerHTML = '';
             showMainApp();
         }

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - Financial Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: #1e293b;
+            color: white;
+            padding: 30px 20px;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            letter-spacing: -0.5px;
+            cursor: pointer;
+        }
+
+        .user-profile {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .user-profile-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .user-profile-role {
+            font-size: 0.85em;
+            color: #94a3b8;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.95em;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background: #3b82f6;
+        }
+
+        .btn-logout-sidebar {
+            margin-top: auto;
+            padding: 12px 15px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s;
+            font-size: 0.95em;
+        }
+
+        .btn-logout-sidebar:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px 40px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+
+        .topbar h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .topbar-subtitle {
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+        }
+
+        .filters-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #475569;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: all 0.2s;
+            background: white;
+            color: #0f172a;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .daily-summary {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .daily-summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .daily-date {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #0f172a;
+        }
+
+        .daily-stats {
+            display: flex;
+            gap: 30px;
+            font-size: 0.9em;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.85em;
+            margin-bottom: 3px;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .stat-value.income {
+            color: #16a34a;
+        }
+
+        .stat-value.expense {
+            color: #dc2626;
+        }
+
+        .stat-value.balance {
+            color: #2563eb;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s;
+        }
+
+        .transaction-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-description {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 6px;
+            font-size: 0.95em;
+        }
+
+        .transaction-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #64748b;
+        }
+
+        .transaction-amount {
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .transaction-amount.income {
+            color: #16a34a;
+        }
+
+        .transaction-amount.expense {
+            color: #dc2626;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .export-btn {
+            padding: 12px 24px;
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background: #15803d;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 968px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .filters-section {
+                grid-template-columns: 1fr;
+            }
+
+            .daily-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo" onclick="window.location.href='index.html'">
+            FinanceTracker
+        </div>
+        <div class="user-profile">
+            <div class="user-profile-name" id="sidebarUsername">Guest</div>
+            <div class="user-profile-role">Account Manager</div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item" onclick="window.location.href='index.html'">Dashboard</li>
+            <li class="nav-item active">Transactions</li>
+            <li class="nav-item" onclick="window.location.href='reports.html'">Reports</li>
+            <li class="nav-item" onclick="window.location.href='settings.html'">Settings</li>
+        </ul>
+        <button class="btn-logout-sidebar" onclick="handleLogout()">Sign Out</button>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <div>
+                <h1>Transaction History</h1>
+                <div class="topbar-subtitle">View detailed logs of all your transactions</div>
+            </div>
+            <button class="export-btn" onclick="exportTransactions()">Export to CSV</button>
+        </div>
+
+        <div class="card">
+            <div class="filters-section">
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" onchange="filterTransactions()">
+                </div>
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" onchange="filterTransactions()">
+                </div>
+                <div class="form-group">
+                    <label for="filterType">Type</label>
+                    <select id="filterType" onchange="filterTransactions()">
+                        <option value="all">All Types</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filterCategory">Category</label>
+                    <select id="filterCategory" onchange="filterTransactions()">
+                        <option value="all">All Categories</option>
+                        <option value="Food">Food & Dining</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Bills">Bills & Utilities</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Education">Education</option>
+                        <option value="Salary">Salary</option>
+                        <option value="Business">Business</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="transactionsByDate"></div>
+
+        <div id="noTransactions" class="card hidden">
+            <div class="empty-state">
+                <p>No transactions found for the selected filters</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let allTransactions = [];
+
+        window.addEventListener('load', () => {
+            checkAuth();
+            setDefaultDates();
+            loadTransactions();
+        });
+
+        function checkAuth() {
+            // In a real app, check session/token
+            currentUser = 'User'; // Placeholder
+            document.getElementById('sidebarUsername').textContent = currentUser;
+        }
+
+        function setDefaultDates() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setMonth(startDate.getMonth() - 1);
+            
+            document.getElementById('endDate').valueAsDate = endDate;
+            document.getElementById('startDate').valueAsDate = startDate;
+        }
+
+        function loadTransactions() {
+            // Load from storage - placeholder data for demo
+            allTransactions = [
+                {
+                    id: 1,
+                    description: 'Salary Payment',
+                    amount: 50000,
+                    type: 'income',
+                    category: 'Salary',
+                    date: '2025-10-30'
+                },
+                {
+                    id: 2,
+                    description: 'Grocery Shopping',
+                    amount: 2500,
+                    type: 'expense',
+                    category: 'Food',
+                    date: '2025-10-30'
+                },
+                {
+                    id: 3,
+                    description: 'Uber Ride',
+                    amount: 250,
+                    type: 'expense',
+                    category: 'Transportation',
+                    date: '2025-10-29'
+                },
+                {
+                    id: 4,
+                    description: 'Freelance Project',
+                    amount: 15000,
+                    type: 'income',
+                    category: 'Business',
+                    date: '2025-10-28'
+                }
+            ];
+            
+            filterTransactions();
+        }
+
+        function filterTransactions() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const filterType = document.getElementById('filterType').value;
+            const filterCategory = document.getElementById('filterCategory').value;
+
+            let filtered = allTransactions.filter(t => {
+                const tDate = new Date(t.date);
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+
+                if (start && tDate < start) return false;
+                if (end && tDate > end) return false;
+                if (filterType !== 'all' && t.type !== filterType) return false;
+                if (filterCategory !== 'all' && t.category !== filterCategory) return false;
+
+                return true;
+            });
+
+            displayTransactionsByDate(filtered);
+        }
+
+        function displayTransactionsByDate(transactions) {
+            const container = document.getElementById('transactionsByDate');
+            const noTransactions = document.getElementById('noTransactions');
+
+            if (transactions.length === 0) {
+                container.innerHTML = '';
+                noTransactions.classList.remove('hidden');
+                return;
+            }
+
+            noTransactions.classList.add('hidden');
+
+            // Group by date
+            const grouped = {};
+            transactions.forEach(t => {
+                if (!grouped[t.date]) {
+                    grouped[t.date] = [];
+                }
+                grouped[t.date].push(t);
+            });
+
+            // Sort dates descending
+            const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
+
+            container.innerHTML = sortedDates.map(date => {
+                const dayTransactions = grouped[date];
+                const dayIncome = dayTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+                const dayExpense = dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+                const dayBalance = dayIncome - dayExpense;
+
+                return `
+                    <div class="card">
+                        <div class="daily-summary">
+                            <div class="daily-summary-header">
+                                <div class="daily-date">${formatDateLong(date)}</div>
+                            </div>
+                            <div class="daily-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Income</span>
+                                    <span class="stat-value income">+${formatCurrency(dayIncome)}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Expenses</span>
+                                    <span class="stat-value expense">-${formatCurrency(dayExpense)}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Net Balance</span>
+                                    <span class="stat-value balance">${formatCurrency(dayBalance)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        ${dayTransactions.map(t => `
+                            <div class="transaction-item">
+                                <div class="transaction-info">
+                                    <div class="transaction-description">${t.description}</div>
+                                    <div class="transaction-meta">
+                                        <span class="category-badge">${t.category}</span>
+                                    </div>
+                                </div>
+                                <div class="transaction-amount ${t.type}">
+                                    ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function exportTransactions() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            let csv = 'Date,Description,Category,Type,Amount\n';
+            
+            allTransactions.forEach(t => {
+                csv += `${t.date},${t.description},${t.category},${t.type},${t.amount}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `transactions_${startDate}_to_${endDate}.csv`;
+            a.click();
+        }
+
+        function formatCurrency(amount) {
+            return '₱' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        function formatDateLong(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to sign out?')) {
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

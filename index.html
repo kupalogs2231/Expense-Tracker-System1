@@ -772,20 +772,30 @@
             const errorDiv = document.getElementById('loginError');
             errorDiv.innerHTML = '';
 
-            if (!users[username]) {
-                errorDiv.innerHTML = '<div class="error-message">Invalid username or password</div>';
+            // Validate inputs
+            if (!username || !password) {
+                errorDiv.innerHTML = '<div class="error-message">Please enter both username and password</div>';
                 return;
             }
 
+            // Check if user exists
+            if (!users[username]) {
+                errorDiv.innerHTML = '<div class="error-message">Account not found. Please create an account first.</div>';
+                return;
+            }
+
+            // Check password
             if (users[username].password !== password) {
                 errorDiv.innerHTML = '<div class="error-message">Invalid username or password</div>';
                 return;
             }
 
+            // Login successful
             currentUser = username;
             loadUserData();
             
             document.getElementById('loginForm').reset();
+            errorDiv.innerHTML = '';
             showMainApp();
         }
 
